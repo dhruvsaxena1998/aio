@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/dhruvsaxena1998/aio/cmd/internal/helpers"
 )
 
 func PingHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	helpers.SuccessResponse(w, map[string]string{
 		"message": "pong",
-	})
+	}, http.StatusOK)
 }

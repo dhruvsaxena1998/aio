@@ -1,18 +1,38 @@
 package middlewares
 
-import "net/http"
+import (
+	"net/http"
+	"os"
 
-const ADMIN_API_KEY = "H6WFaOZ7-8JWFgXo-P10UNPzG-NIKQs3DU-WU4SB6D1"
+	"context"
+)
+
+type ContextKey string
+
+const (
+	UserIdContextKey ContextKey = "user_id"
+)
 
 func OnlyAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiKey := r.Header.Get("X-API-Key")
 
-		if apiKey != ADMIN_API_KEY {
-			http.Error(w, "Forbidden", http.StatusForbidden)
+		if apiKey != os.Getenv("API_KEY") {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		userID := uint(1)
+
+		ctx := context.WithValue(r.Context(), UserIdContextKey, userID)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func GetUserIDFromContext(ctx context.Context) (uint, bool) {
+	if userID, ok := ctx.Value(UserIdContextKey).(uint); ok {
+		return userID, true
+	}
+	return 0, false
 }

@@ -1,0 +1,19 @@
+meta {
+  name: add-completion
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{domain}}/api/{{version}}/habits/:id/complete
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 2
+}
+
+body:json {
+  {}
+}

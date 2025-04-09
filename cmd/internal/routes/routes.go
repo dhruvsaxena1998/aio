@@ -25,6 +25,12 @@ func New() http.Handler {
 		api.Use(middlewares.OnlyAdmin)
 
 		api.Get("/secret", handlers.SecretHandler)
+
+		api.Route("/habits", func(habits chi.Router) {
+			habits.Post("/", handlers.CreateHabitHandler)
+			habits.Get("/", handlers.GetHabitsHandler)
+			habits.Post("/{id}/complete", handlers.CreateCompletionHandler)
+		})
 	})
 
 	return r
