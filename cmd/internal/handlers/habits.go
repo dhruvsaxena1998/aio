@@ -21,12 +21,12 @@ func CreateHabitHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	user, ok := middlewares.GetUserFromContext(r.Context())
 	if !ok {
 		helpers.ErrorResponse(w, "User ID not found in context", http.StatusInternalServerError)
 		return
 	}
-	input.UserID = userID
+	input.UserID = user.ID
 
 	if err := database.DB.Create(&input).Error; err != nil {
 		helpers.ErrorResponse(w, "Failed to create habit", http.StatusInternalServerError)
@@ -37,7 +37,7 @@ func CreateHabitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetHabitsHandler(w http.ResponseWriter, r *http.Request) {
-	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	user, ok := middlewares.GetUserFromContext(r.Context())
 	if !ok {
 		helpers.ErrorResponse(w, "User ID not found in context", http.StatusInternalServerError)
 		return
@@ -45,7 +45,7 @@ func GetHabitsHandler(w http.ResponseWriter, r *http.Request) {
 
 	var habits []models.Habit
 	if err := database.DB.
-		Where("user_id = ?", userID).
+		Where("user_id = ?", user.ID).
 		Preload("Completions").
 		Find(&habits).Error; err != nil {
 		helpers.ErrorResponse(w, "Failed to fetch habits", http.StatusInternalServerError)
@@ -71,7 +71,7 @@ func CreateCompletionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	input.HabitID = uint(habitID)
 
-	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	user, ok := middlewares.GetUserFromContext(r.Context())
 	if !ok {
 		helpers.ErrorResponse(w, "User ID not found in context", http.StatusInternalServerError)
 		return
@@ -79,7 +79,7 @@ func CreateCompletionHandler(w http.ResponseWriter, r *http.Request) {
 
 	var habit models.Habit
 	if err := database.DB.
-		Where("id = ? AND user_id = ?", habitID, userID).
+		Where("id = ? AND user_id = ?", habitID, user.ID).
 		First(&habit).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			helpers.ErrorResponse(w, "Habit not found or does not belong to the user", http.StatusNotFound)
@@ -105,14 +105,14 @@ func GetCompletionsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, ok := middlewares.GetUserIDFromContext(r.Context())
+	user, ok := middlewares.GetUserFromContext(r.Context())
 	if !ok {
 		helpers.ErrorResponse(w, "User ID not found in context", http.StatusInternalServerError)
 		return
 	}
 	var habit models.Habit
 	if err := database.DB.
-		Where("id = ? AND user_id = ?", habitID, userID).
+		Where("id = ? AND user_id = ?", habitID, user.ID).
 		First(&habit).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			helpers.ErrorResponse(w, "Habit not found or does not belong to the user", http.StatusNotFound)

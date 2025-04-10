@@ -32,6 +32,8 @@ func Init() {
 
 	err = DB.AutoMigrate(
 		&models.User{},
+		&models.Permission{},
+		&models.RoleGroup{},
 		&models.Habit{},
 		&models.Completion{},
 	)

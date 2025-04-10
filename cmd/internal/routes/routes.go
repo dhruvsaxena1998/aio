@@ -22,9 +22,11 @@ func New() http.Handler {
 
 	// Admin only routes
 	r.Route("/api/v1", func(api chi.Router) {
-		api.Use(middlewares.OnlyAdmin)
 
-		api.Get("/secret", handlers.SecretHandler)
+		api.Use(middlewares.RequireAPIKey)
+
+		api.With(middlewares.RequireSuperAdministrator).
+			Get("/secret", handlers.SecretHandler)
 
 		api.Route("/habits", func(habits chi.Router) {
 			habits.Post("/", handlers.CreateHabitHandler)
@@ -32,6 +34,7 @@ func New() http.Handler {
 			habits.Post("/{id}/complete", handlers.CreateCompletionHandler)
 			habits.Get("/{id}/completions", handlers.GetCompletionsHandler)
 		})
+
 	})
 
 	return r
