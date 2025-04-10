@@ -30,6 +30,7 @@ func New() http.Handler {
 			habits.Post("/", handlers.CreateHabitHandler)
 			habits.Get("/", handlers.GetHabitsHandler)
 			habits.Post("/{id}/complete", handlers.CreateCompletionHandler)
+			habits.Get("/{id}/completions", handlers.GetCompletionsHandler)
 		})
 	})
 

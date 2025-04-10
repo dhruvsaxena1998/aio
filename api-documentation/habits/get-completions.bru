@@ -1,0 +1,15 @@
+meta {
+  name: get-completions
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{domain}}/api/{{version}}/habits/:id/completions
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 2
+}

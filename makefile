@@ -7,3 +7,6 @@ run:
 
 build:
 	go build -o bin/$(APP_NAME) $(MAIN)
+
+test:
+	go test ./...
