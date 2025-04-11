@@ -11,7 +11,7 @@ import (
 const defaultAPIKeyLength = 24
 const defaultHyphenInterval = 8
 
-// GenerateAPIKey generates a random API key of a specified length (default is 32 characters).
+// GenerateAPIKey generates a random API key of a specified length (default is 24 characters).
 func GenerateAPIKey(length int, hyphenInterval int) (string, error) {
 	if length <= 0 {
 		length = defaultAPIKeyLength
@@ -38,7 +38,7 @@ func GenerateAPIKey(length int, hyphenInterval int) (string, error) {
 	return result.String(), nil
 }
 
-// GenerateDefaultAPIKey generates a random API key with the default length (32 characters).
+// GenerateDefaultAPIKey generates a random API key with the default length (24 characters).
 func GenerateDefaultAPIKey() (string, error) {
 	return GenerateAPIKey(defaultAPIKeyLength, defaultHyphenInterval)
 }
