@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -29,14 +30,30 @@ func (ht HabitType) IsValid() bool {
 	return ht == GoodHabit || ht == BadHabit
 }
 
+func StringToHabitType(s string) (HabitType, error) {
+	switch strings.ToLower(s) {
+	case "good":
+		return GoodHabit, nil
+	case "bad":
+		return BadHabit, nil
+	default:
+		return GoodHabit, fmt.Errorf("invalid habit type: %s", s)
+	}
+}
+
 type Habit struct {
 	Base
 
-	UserID      uint      `gorm:"not null;index" json:"user_id"`
-	Name        string    `gorm:"not null" json:"name"`
-	Type        HabitType `gorm:"not null" json:"type"`
-	IsActive    bool      `gorm:"not null;default:true" json:"is_active"`
-	Completions []Completion
+	UserID      uint         `gorm:"not null;index" json:"user_id"`
+	Name        string       `gorm:"not null" json:"name"`
+	Type        HabitType    `gorm:"not null" json:"type"`
+	IsActive    bool         `gorm:"not null;default:true" json:"is_active"`
+	Completions []Completion `json:"completions"`
+}
+
+type HabitRequestDTO struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
 }
 
 func (h *Habit) validateHabitType() error {

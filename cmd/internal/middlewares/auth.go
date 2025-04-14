@@ -6,7 +6,6 @@ import (
 
 	"context"
 
-	"github.com/dhruvsaxena1998/aio/cmd/internal/database"
 	"github.com/dhruvsaxena1998/aio/cmd/internal/helpers"
 	"github.com/dhruvsaxena1998/aio/cmd/internal/models"
 	"gorm.io/gorm"
@@ -18,7 +17,7 @@ const (
 	UserContextKey ContextKey = "user"
 )
 
-func RequireAPIKey(next http.Handler) http.Handler {
+func (m *Middleware) RequireAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apiKey := r.Header.Get("X-API-Key")
 		if apiKey == "" {
@@ -27,7 +26,7 @@ func RequireAPIKey(next http.Handler) http.Handler {
 		}
 
 		var user models.User
-		err := database.DB.
+		err := m.db.
 			Preload("RoleGroup.Permissions").
 			Where(&models.User{APIKey: apiKey, IsActive: true}).
 			First(&user).Error
@@ -46,7 +45,7 @@ func RequireAPIKey(next http.Handler) http.Handler {
 	})
 }
 
-func RequireSuperAdministrator(next http.Handler) http.Handler {
+func (m *Middleware) RequireSuperAdministrator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, ok := GetUserFromContext(r.Context())
 		if !ok {
@@ -54,7 +53,7 @@ func RequireSuperAdministrator(next http.Handler) http.Handler {
 			return
 		}
 
-		hasPermission, err := user.HasPermissions(database.DB, "allow:all")
+		hasPermission, err := user.HasPermissions(m.db, "allow:all")
 		if err != nil || !hasPermission {
 			helpers.ErrorResponse(w, "You do not have permission to access this resource", http.StatusForbidden)
 			return
