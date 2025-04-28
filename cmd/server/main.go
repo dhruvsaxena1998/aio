@@ -11,17 +11,11 @@ import (
 
 	"github.com/dhruvsaxena1998/aio/cmd/internal/database"
 	"github.com/dhruvsaxena1998/aio/cmd/internal/routes"
-	"github.com/joho/godotenv"
 )
 
 const defaultPort = "8080"
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("No .env file found. Proceeding with defaults...")
-	}
-
 	database.Init()
 	db := database.GetDB()
 	if db == nil {
